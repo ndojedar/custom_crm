@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_crm_lead_form_custom" model="ir.ui.view">
+            <field name="name">crm.lead.form.custom</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_set_won_rainbowman']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='%(crm.crm_lead_lost_action)d']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='toggle_active']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_set_lost']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//widget[1][@name='web_ribbon']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('stage_id', '!=', 6)]}</attribute>
+                </xpath>
+                <xpath expr="//widget[1][@name='web_ribbon']" position="after">
+                    <widget name="web_ribbon" title="Cancelado" bg_color="bg-danger" attrs="{'invisible': [('stage_id', '!=', 7)]}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_crm_lead_form_custom2" model="ir.ui.view">
+            <field name="name">crm.lead.form.custom2</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_sale_quotations_new']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('stage_id', 'not in', (1, 2, 3, 5))]}</attribute>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

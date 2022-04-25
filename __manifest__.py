@@ -26,7 +26,7 @@
     'data': [
         'data/automated.xml',
         # 'security/ir.model.access.csv',
-        'views/so_rev_views.xml',
+        'views/crm_lead_view.xml',
         #'views/templates.xml',
     ],
     # only loaded in demonstration mode

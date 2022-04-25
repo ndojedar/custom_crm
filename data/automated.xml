@@ -1,22 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Al crear un presupuesto, se actualiza el estado del CRM a Propuesta -->
+    <!-- ######################### SALE ORDER #############################################-->
+
+    <!-- Al crear un presupuesto, se actualiza el estado del CRM a En Elaboración -->
     <record id="sale_order_on_create" model="base.automation">
-        <field name="name">Pedido Creado</field>
+        <field name="name">Presupuesto Creado</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
         <field name="code">
-proposition_stage_id = env['crm.stage'].search([('id', '=', 3)]).id
+proposition_stage_id = env['crm.stage'].search([('id', '=', 2)]).id
 record.opportunity_id.write({'stage_id': proposition_stage_id})
         </field>
         <field name="trigger">on_create</field>
         <field name="active">1</field>
     </record>
 
+    <!-- Al enviar un presupuesto, se actualiza el estado del CRM a Enviado -->
+    <record id="sale_order_on_write_enviado" model="base.automation">
+        <field name="name">Presupuesto Enviado</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">
+proposition_stage_id = env['crm.stage'].search([('id', '=', 3)]).id
+record.opportunity_id.write({'stage_id': proposition_stage_id})
+        </field>
+        <field name="trigger_field_ids" eval="[(4,ref('sale.field_sale_order__state'))]"></field>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[('state', '=', 'sent')]</field>
+        <field name="active">1</field>
+    </record> 
+
     <!-- Al confirmar un presupuesto, se actualiza el estado del CRM a Ganado -->
     <record id="sale_order_on_write_confirmed" model="base.automation">
-        <field name="name">Pedido Confirmado</field>
+        <field name="name">Presupuesto Confirmado</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
         <field name="code">
@@ -28,19 +45,53 @@ record.opportunity_id.write({'stage_id': proposition_stage_id})
         <field name="filter_domain">[('state', '=', 'sale')]</field>
         <field name="active">1</field>
     </record>
+  
+    <!-- ######################### CRM #############################################-->
 
-    <!-- Al cancelar un presupuesto, se actualiza el estado del CRM a Perdido -->
-    <record id="sale_order_on_write_canceled" model="base.automation">
-        <field name="name">Pedido Cancelado</field>
-        <field name="model_id" ref="sale.model_sale_order"/>
+    <!-- Al confirmar un presupuesto, se cancela las proformas no seleccionadas -->
+    <record id="sale_order_on_write_cancel_no_selected" model="base.automation">
+        <field name="name">Cancelar presupuestos no seleccionados</field>
+        <field name="model_id" ref="website_crm.model_crm_lead"/>
         <field name="state">code</field>
         <field name="code">
-record.opportunity_id.write({'probability': 0, 'active': False })
+for rec in record.order_ids:
+  if rec.state in ('draft', 'sent'):
+    rec.write({'state': 'cancel'})
         </field>
-        <field name="trigger_field_ids" eval="[(4,ref('sale.field_sale_order__state'))]"></field>
+        <field name="trigger_field_ids" eval="[(4,ref('crm.field_crm_lead__stage_id'))]"></field>
         <field name="trigger">on_write</field>
-        <field name="filter_domain">[('state', '=', 'cancel')]</field>
+        <field name="filter_domain">[("stage_id","=",4)]</field>
         <field name="active">1</field>
-    </record> 
-  
+    </record>
+    
+    <!-- Al dar por perdido una oportunidad, se actualiza la etapa a perdido -->
+    <record id="sale_order_on_write_opportunity_lost" model="base.automation">
+        <field name="name">Oportunidad perdida</field>
+        <field name="model_id" ref="website_crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">
+record.write({'stage_id': 6, 'probability': 0})
+record.order_ids.write({'state': 'cancel'})
+        </field>
+        <field name="trigger_field_ids" eval="[(4,ref('crm.field_crm_lead__stage_id'))]"></field>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[("stage_id","=",6)]</field>
+        <field name="active">1</field>
+    </record>
+
+        <!-- Al dar por cancelado una oportunidad, se actualiza la etapa a cancelado -->
+    <record id="sale_order_on_write_opportunity_cancel" model="base.automation">
+        <field name="name">Oportunidad cancelada</field>
+        <field name="model_id" ref="website_crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">
+record.write({'stage_id': 7, 'probability': 0})
+record.order_ids.write({'state': 'cancel'})
+        </field>
+        <field name="trigger_field_ids" eval="[(4,ref('crm.field_crm_lead__stage_id'))]"></field>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[("stage_id","=",7)]</field>
+        <field name="active">1</field>
+    </record>
+
 </odoo>
