@@ -1,8 +1,19 @@
-# from odoo import models, fields
+
+from odoo import _, fields, models
+from odoo.exceptions import UserError
 
 
-# class SaleOrder(models.Model):
-#     _inherit = 'sale.order'
+class SaleOrder(models.Model):
+    _inherit = "sale.order"
+
+    active = fields.Boolean(default=True)
+
+    def toggle_active(self):
+        if self.filtered(lambda so: so.state not in ["cancel"] and so.active):
+            raise UserError(_("Solo se pueden archivar pedidos 'Cancelados'"))
+        return super().toggle_active()
+
+
 
 #     def _order_revised_count(self):
 #         for rec in self:

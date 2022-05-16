@@ -25,6 +25,40 @@
                 <xpath expr="//widget[1][@name='web_ribbon']" position="after">
                     <widget name="web_ribbon" title="Cancelado" bg_color="bg-danger" attrs="{'invisible': [('stage_id', '!=', 7)]}"/>
                 </xpath>
+
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='lead']/group[1]/group[2]/label[1]" position="before">
+                    <field name="contact_names" domain="[('parent_id', '=', partner_id)]"/>
+                    <field name="contact_email" widget="email"/>
+                    <field name="contact_function" />
+                    <field name="contact_phone" widget="phone"/>
+                    <field name="contact_mobil" widget="phone"/>
+                </xpath>
+
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='lead']/group[1]/group[2]/label[1]" position="attributes">
+                    <attribute name="attrs">{}</attribute>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='lead']/group[1]/group[2]/div[1]/field[@name='contact_name']" position="attributes">
+                    <attribute name="attrs">{}</attribute>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='lead']/group[1]/group[2]/div[1]/field[@name='title']" position="attributes">
+                    <attribute name="attrs">{}</attribute>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='lead']/group[1]/group[2]/field[@name='function']" position="attributes">
+                    <attribute name="attrs">{}</attribute>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='lead']/group[1]/group[2]/label[2]" position="attributes">
+                    <attribute name="attrs">{}</attribute>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='lead']/group[1]/group[2]/div[2]/field[@name='mobile']" position="attributes">
+                    <attribute name="attrs">{}</attribute>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
             </field>
         </record>
 
@@ -33,7 +67,8 @@
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
             <field name="arch" type="xml">
-                <xpath expr="//button[@name='action_sale_quotations_new']" position="attributes">
+                <xpath expr="//button[@name='action_create_quotation']" position="attributes">
+                    <attribute name="string">Nuevo Presupuesto</attribute>
                     <attribute name="attrs">{'invisible': [('stage_id', 'not in', (1, 2, 3, 5))]}</attribute>
                 </xpath>
             </field>

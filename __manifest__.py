@@ -20,14 +20,22 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'base_automation', 'sale_management'],
+    'depends': [
+        'base', 
+        'crm', 
+        'crm_opportunity_product', 
+        'base_automation',
+        'sale', 
+        'sale_management'
+    ],
 
     # always loaded
     'data': [
         'data/automated.xml',
+        # 'data/mail_data.xml',
         # 'security/ir.model.access.csv',
         'views/crm_lead_view.xml',
-        #'views/templates.xml',
+        'views/so_rev_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

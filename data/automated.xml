@@ -9,10 +9,10 @@
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
         <field name="code">
-proposition_stage_id = env['crm.stage'].search([('id', '=', 2)]).id
-record.opportunity_id.write({'stage_id': proposition_stage_id})
+record.opportunity_id.write({'stage_id': 2})
         </field>
         <field name="trigger">on_create</field>
+        <field name="filter_domain">[("opportunity_id","!=",False)]</field>
         <field name="active">1</field>
     </record>
 
@@ -22,12 +22,12 @@ record.opportunity_id.write({'stage_id': proposition_stage_id})
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
         <field name="code">
-proposition_stage_id = env['crm.stage'].search([('id', '=', 3)]).id
-record.opportunity_id.write({'stage_id': proposition_stage_id})
+expected_revenue = record.amount_untaxed
+record.opportunity_id.write({'stage_id': 3, 'expected_revenue': expected_revenue})
         </field>
         <field name="trigger_field_ids" eval="[(4,ref('sale.field_sale_order__state'))]"></field>
         <field name="trigger">on_write</field>
-        <field name="filter_domain">[('state', '=', 'sent')]</field>
+        <field name="filter_domain">["&amp;",('state', '=', 'sent'),("opportunity_id","!=",False)]</field>
         <field name="active">1</field>
     </record> 
 
@@ -37,12 +37,28 @@ record.opportunity_id.write({'stage_id': proposition_stage_id})
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
         <field name="code">
-proposition_stage_id = env['crm.stage'].search([('id', '=', 4)]).id
-record.opportunity_id.write({'stage_id': proposition_stage_id})
+for rec in record.opportunity_id.order_ids:
+  if rec.state in ('draft', 'sent'):
+    rec.write({'state': 'cancel'})
+record.opportunity_id.write({'stage_id': 4, 'probability': 100})
         </field>
         <field name="trigger_field_ids" eval="[(4,ref('sale.field_sale_order__state'))]"></field>
         <field name="trigger">on_write</field>
-        <field name="filter_domain">[('state', '=', 'sale')]</field>
+        <field name="filter_domain">["&amp;",("state","=","sale"),("opportunity_id","!=",False)]</field>
+        <field name="active">1</field>
+    </record>
+
+    <!-- Al cancelar un presupuesto, se archiva el registro -->
+    <record id="sale_order_on_write_cancel" model="base.automation">
+        <field name="name">Presupuesto Cancelado</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">
+record.write({'active': False})
+        </field>
+        <field name="trigger_field_ids" eval="[(4,ref('sale.field_sale_order__state'))]"></field>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[('state', '=', 'cancel')]</field>
         <field name="active">1</field>
     </record>
   
@@ -50,13 +66,13 @@ record.opportunity_id.write({'stage_id': proposition_stage_id})
 
     <!-- Al confirmar un presupuesto, se cancela las proformas no seleccionadas -->
     <record id="sale_order_on_write_cancel_no_selected" model="base.automation">
-        <field name="name">Cancelar presupuestos no seleccionados</field>
+        <field name="name">Validar oportunidad ganada</field>
         <field name="model_id" ref="website_crm.model_crm_lead"/>
         <field name="state">code</field>
         <field name="code">
 for rec in record.order_ids:
-  if rec.state in ('draft', 'sent'):
-    rec.write({'state': 'cancel'})
+  if rec.state in ('draft','sent'):
+    raise UserError('Movimiento inválido, para dar por ganado una oportunidad, debes confirmar un presupuesto')
         </field>
         <field name="trigger_field_ids" eval="[(4,ref('crm.field_crm_lead__stage_id'))]"></field>
         <field name="trigger">on_write</field>
