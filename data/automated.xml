@@ -64,7 +64,39 @@ record.write({'active': False})
   
     <!-- ######################### CRM #############################################-->
 
-    <!-- Al confirmar un presupuesto, se cancela las proformas no seleccionadas -->
+    <!-- Validar cambio de etapa de Prospección a Elaboración -->
+    <record id="sale_order_on_write_cancel_no_selected" model="base.automation">
+        <field name="name">Validar prospeccion a elaboracion</field>
+        <field name="model_id" ref="website_crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">
+if not record.order_ids:
+  raise UserError('Movimiento inválido, debe crear un presupuesto')
+        </field>
+        <field name="trigger_field_ids" eval="[(4,ref('crm.field_crm_lead__stage_id'))]"></field>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[("stage_id","=",2)]</field>
+        <field name="active">1</field>
+    </record>
+
+    <!-- Validar cambio de etapa de Elaboración  a Enviada-->
+    <record id="sale_order_on_write_cancel_no_selected" model="base.automation">
+        <field name="name">Validar elaboracion a enviado</field>
+        <field name="model_id" ref="website_crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">
+if record.order_ids:
+  for rec in record.order_ids:
+    if rec.state != 'sent':
+      raise UserError('Movimiento inválido, debe haber enviado un presupuesto')
+        </field>
+        <field name="trigger_field_ids" eval="[(4,ref('crm.field_crm_lead__stage_id'))]"></field>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[("stage_id","=",3)]</field>
+        <field name="active">1</field>
+    </record>
+
+    <!-- Validar cambio de etapa de oportunidad Enviada a oportunidad Ganada -->
     <record id="sale_order_on_write_cancel_no_selected" model="base.automation">
         <field name="name">Validar oportunidad ganada</field>
         <field name="model_id" ref="website_crm.model_crm_lead"/>
@@ -86,8 +118,8 @@ for rec in record.order_ids:
         <field name="model_id" ref="website_crm.model_crm_lead"/>
         <field name="state">code</field>
         <field name="code">
-record.write({'stage_id': 6, 'probability': 0})
 record.order_ids.write({'state': 'cancel'})
+record.write({'stage_id': 6, 'probability': 0})
         </field>
         <field name="trigger_field_ids" eval="[(4,ref('crm.field_crm_lead__stage_id'))]"></field>
         <field name="trigger">on_write</field>
@@ -101,8 +133,8 @@ record.order_ids.write({'state': 'cancel'})
         <field name="model_id" ref="website_crm.model_crm_lead"/>
         <field name="state">code</field>
         <field name="code">
-record.write({'stage_id': 7, 'probability': 0})
 record.order_ids.write({'state': 'cancel'})
+record.write({'stage_id': 7, 'probability': 0})
         </field>
         <field name="trigger_field_ids" eval="[(4,ref('crm.field_crm_lead__stage_id'))]"></field>
         <field name="trigger">on_write</field>

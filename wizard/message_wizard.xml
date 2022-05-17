@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="custom_crm_message_wizard" model="ir.ui.view">
+        <field name="name">custom.crm.message.wizard</field>
+        <field name="model">crm.message.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Mensaje">
+                <separator string="Message" colspan="6" />
+                <field name="message" colspan="4" nolabel="1" readonly="1" widget="html"/>
+                <newline/>
+				<separator colspan="6"/>
+                <footer>
+                    <button string="OK" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

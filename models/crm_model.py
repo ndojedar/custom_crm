@@ -34,4 +34,4 @@ class CustomCrm(models.Model):
             if last_stage_id == 7 and next_stage_id != 7:
                 raise UserError(_('Movimiento inválido, una oportunadad cancelada no puede cambiar de etapa, en su lugar cree una nueva'))
         return res
-        
+
