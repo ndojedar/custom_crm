@@ -17,7 +17,7 @@ record.opportunity_id.write({'stage_id': 2})
     </record>
 
     <!-- Al enviar un presupuesto, se actualiza el estado del CRM a Enviado -->
-    <record id="sale_order_on_write_enviado" model="base.automation">
+    <record id="sale_order_on_write_sent" model="base.automation">
         <field name="name">Presupuesto Enviado</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
@@ -40,7 +40,8 @@ record.opportunity_id.write({'stage_id': 3, 'expected_revenue': expected_revenue
 for rec in record.opportunity_id.order_ids:
   if rec.state in ('draft', 'sent'):
     rec.write({'state': 'cancel'})
-record.opportunity_id.write({'stage_id': 4, 'probability': 100})
+expected_revenue = record.amount_untaxed
+record.opportunity_id.write({'stage_id': 4, 'probability': 100, 'expected_revenue': expected_revenue})
         </field>
         <field name="trigger_field_ids" eval="[(4,ref('sale.field_sale_order__state'))]"></field>
         <field name="trigger">on_write</field>
@@ -65,7 +66,7 @@ record.write({'active': False})
     <!-- ######################### CRM #############################################-->
 
     <!-- Validar cambio de etapa de Prospección a Elaboración -->
-    <record id="sale_order_on_write_cancel_no_selected" model="base.automation">
+    <record id="crm_on_write_prospection_to_elaboration" model="base.automation">
         <field name="name">Validar prospeccion a elaboracion</field>
         <field name="model_id" ref="website_crm.model_crm_lead"/>
         <field name="state">code</field>
@@ -79,8 +80,8 @@ if not record.order_ids:
         <field name="active">1</field>
     </record>
 
-    <!-- Validar cambio de etapa de Elaboración  a Enviada-->
-    <record id="sale_order_on_write_cancel_no_selected" model="base.automation">
+    <!-- Validar cambio de etapa de Elaboración a Enviada-->
+    <record id="crm_on_write_elaboration_to_sent" model="base.automation">
         <field name="name">Validar elaboracion a enviado</field>
         <field name="model_id" ref="website_crm.model_crm_lead"/>
         <field name="state">code</field>
@@ -97,7 +98,7 @@ if record.order_ids:
     </record>
 
     <!-- Validar cambio de etapa de oportunidad Enviada a oportunidad Ganada -->
-    <record id="sale_order_on_write_cancel_no_selected" model="base.automation">
+    <record id="crm_on_write_won_validation" model="base.automation">
         <field name="name">Validar oportunidad ganada</field>
         <field name="model_id" ref="website_crm.model_crm_lead"/>
         <field name="state">code</field>
@@ -113,7 +114,7 @@ for rec in record.order_ids:
     </record>
     
     <!-- Al dar por perdido una oportunidad, se actualiza la etapa a perdido -->
-    <record id="sale_order_on_write_opportunity_lost" model="base.automation">
+    <record id="crm_on_write_opportunity_lost" model="base.automation">
         <field name="name">Oportunidad perdida</field>
         <field name="model_id" ref="website_crm.model_crm_lead"/>
         <field name="state">code</field>
@@ -127,8 +128,8 @@ record.write({'stage_id': 6, 'probability': 0})
         <field name="active">1</field>
     </record>
 
-        <!-- Al dar por cancelado una oportunidad, se actualiza la etapa a cancelado -->
-    <record id="sale_order_on_write_opportunity_cancel" model="base.automation">
+    <!-- Al dar por cancelado una oportunidad, se actualiza la etapa a cancelado 
+    <record id="crm_on_write_opportunity_cancel" model="base.automation">
         <field name="name">Oportunidad cancelada</field>
         <field name="model_id" ref="website_crm.model_crm_lead"/>
         <field name="state">code</field>
@@ -141,5 +142,6 @@ record.write({'stage_id': 7, 'probability': 0})
         <field name="filter_domain">[("stage_id","=",7)]</field>
         <field name="active">1</field>
     </record>
+    -->
 
 </odoo>
